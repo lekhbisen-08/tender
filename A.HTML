@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRTPL — Tender Portal Directory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1b1815;
+    --surface: #24211c;
+    --surface-2: #2c2822;
+    --hairline: #3c362d;
+    --text: #ece6d9;
+    --text-muted: #a89e8d;
+    --amber: #e0a458;
+    --amber-dim: #b98543;
+    --green: #6b9a72;
+    --rust: #c2694a;
+    --steel: #7fa0ad;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+  }
+
+  .wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  header.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 16px;
+    border-bottom: 2px solid var(--hairline);
+    padding-bottom: 20px;
+    margin-bottom: 28px;
+  }
+
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin: 0 0 6px;
+  }
+
+  h1 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 34px;
+    letter-spacing: 0.01em;
+    margin: 0;
+    text-transform: uppercase;
+  }
+
+  .subtitle {
+    color: var(--text-muted);
+    font-size: 14.5px;
+    max-width: 520px;
+    margin-top: 6px;
+  }
+
+  .all-tenders-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--amber);
+    color: #1b1815;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 15px;
+    padding: 14px 22px;
+    border-radius: 3px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+    white-space: nowrap;
+  }
+  .all-tenders-btn:hover { background: #eeb877; }
+  .all-tenders-btn:active { transform: translateY(1px); }
+  .all-tenders-btn:focus-visible { outline: 2px solid var(--steel); outline-offset: 2px; }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  input[type="text"] {
+    flex: 1 1 280px;
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    color: var(--text);
+    padding: 12px 14px;
+    border-radius: 3px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14.5px;
+  }
+  input[type="text"]:focus-visible {
+    outline: 2px solid var(--amber);
+    outline-offset: 1px;
+  }
+  input[type="text"]::placeholder { color: var(--text-muted); }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 14px 0 28px;
+  }
+
+  .tag-chip {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.03em;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--hairline);
+    background: var(--surface);
+    color: var(--text-muted);
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.12s ease;
+  }
+  .tag-chip:hover { border-color: var(--amber-dim); color: var(--text); }
+  .tag-chip.active {
+    background: var(--amber);
+    color: #1b1815;
+    border-color: var(--amber);
+    font-weight: 500;
+  }
+  .tag-chip:focus-visible { outline: 2px solid var(--steel); outline-offset: 2px; }
+
+  .result-count {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  .company-list { display: flex; flex-direction: column; gap: 1px; }
+
+  .company-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-left: 3px solid var(--hairline);
+    padding: 16px 18px;
+    border-radius: 2px;
+    flex-wrap: wrap;
+  }
+  .company-row[data-kind="coal"] { border-left-color: var(--amber); }
+  .company-row[data-kind="power"] { border-left-color: var(--steel); }
+  .company-row[data-kind="private"] { border-left-color: var(--rust); }
+  .company-row[data-kind="psu"] { border-left-color: var(--green); }
+
+  .company-main { flex: 1 1 300px; min-width: 220px; }
+
+  .company-name {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: 17px;
+    letter-spacing: 0.01em;
+  }
+
+  .company-operator {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: 3px;
+    line-height: 1.4;
+  }
+
+  .chip-set { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .mini-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    color: var(--text-muted);
+    background: var(--surface-2);
+    padding: 2px 7px;
+    border-radius: 999px;
+    text-transform: lowercase;
+  }
+
+  .row-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 9px 14px;
+    border-radius: 3px;
+    text-decoration: none;
+    border: 1px solid var(--hairline);
+    color: var(--text);
+    background: var(--surface-2);
+    white-space: nowrap;
+    transition: border-color 0.12s ease, background 0.12s ease;
+  }
+  .btn:hover { border-color: var(--amber-dim); }
+  .btn:focus-visible { outline: 2px solid var(--steel); outline-offset: 2px; }
+  .btn.primary {
+    background: var(--amber);
+    color: #1b1815;
+    border-color: var(--amber);
+    font-weight: 600;
+  }
+  .btn.primary:hover { background: #eeb877; }
+  .btn.placeholder {
+    background: transparent;
+    color: var(--text-muted);
+    border-style: dashed;
+    cursor: default;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--text-muted);
+    font-size: 14px;
+    border: 1px dashed var(--hairline);
+    border-radius: 3px;
+  }
+
+  .agg-section { margin-top: 44px; }
+  .agg-section h2 {
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+    font-size: 18px;
+    letter-spacing: 0.02em;
+    border-bottom: 2px solid var(--hairline);
+    padding-bottom: 10px;
+    margin-bottom: 16px;
+  }
+  .agg-note { color: var(--text-muted); font-size: 13.5px; margin: -6px 0 18px; }
+
+  .agg-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    padding: 14px 18px;
+    border-radius: 2px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .agg-name { font-weight: 600; font-size: 14.5px; }
+  .agg-desc { color: var(--text-muted); font-size: 12.5px; margin-top: 2px; }
+
+  .config-note {
+    margin-top: 40px;
+    padding: 14px 16px;
+    background: var(--surface-2);
+    border: 1px solid var(--hairline);
+    border-radius: 3px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+  .config-note strong { color: var(--amber); }
+
+  @media (max-width: 560px) {
+    h1 { font-size: 26px; }
+    .company-row { flex-direction: column; align-items: flex-start; }
+    .row-actions { width: 100%; }
+    .row-actions .btn { flex: 1; text-align: center; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <p class="eyebrow">PRTPL · Coal Transport &amp; Allied Works</p>
+      <h1>Tender Portal Directory</h1>
+      <p class="subtitle">Every organization you track, one official link away. No scraped data — every button opens the real source.</p>
+    </div>
+    <a href="#" id="allTendersBtn" class="all-tenders-btn">▤ All Tenders</a>
+  </header>
+
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="Search by name, sector, or keyword (coal, power, transport, private, chhattisgarh...)">
+  </div>
+  <div class="tag-row" id="tagRow"></div>
+  <p class="result-count" id="resultCount"></p>
+
+  <div class="company-list" id="companyList"></div>
+  <div class="empty-state" id="emptyState" style="display:none;">No organizations match that search — try a different keyword or clear the filter.</div>
+
+  <div class="agg-section">
+    <h2>All-Tenders Aggregator Portals</h2>
+    <p class="agg-note">These already combine listings from many organizations in one place — the closest thing to a genuine "all tenders" view.</p>
+    <div id="aggList"></div>
+  </div>
+
+  <div class="config-note">
+    <strong>Setup:</strong> this page links to your Streamlit app at <strong>STREAMLIT_URL</strong> (currently <span id="urlDisplay"></span>).
+    Edit the <code>STREAMLIT_URL</code> constant near the top of the &lt;script&gt; block once you've deployed
+    (e.g. to Streamlit Community Cloud) — until then it points at <code>http://localhost:8501</code> for local use.
+  </div>
+
+</div>
+
+<script>
+  // ---- EDIT THIS once your Streamlit app is running/deployed ----
+  const STREAMLIT_URL = "http://localhost:8501";
+  // -----------------------------------------------------------------
+
+ const COMPANIES = [
+    { id: "cil", name: "Coal India Limited (CIL)", operator: "Central PSU — Ministry of Coal", tags: ["coal","psu","central"], official: "https://www.coalindia.in", tender: "https://www.coalindia.in/our-business/auction/" },
+    { id: "secl", name: "South Eastern Coalfields Ltd (SECL)", operator: "Coal India subsidiary — HQ Bilaspur, Chhattisgarh", tags: ["coal","psu","central","chhattisgarh"], official: "https://www.secl-cil.in", tender: "https://secl-cil.in/tenders" },
+    { id: "mcl", name: "Mahanadi Coalfields Ltd (MCL)", operator: "Coal India subsidiary — HQ Sambalpur, Odisha", tags: ["coal","psu","central"], official: "https://www.mahanadicoal.in", tender: "https://coalindiatenders.nic.in/nicgep/app" },
+    { id: "ncl", name: "Northern Coalfields Ltd (NCL)", operator: "Coal India subsidiary — HQ Singrauli, MP", tags: ["coal","psu","central"], official: "http://www.nclcil.in", tender: "https://www.nclcil.in/data-listing/pages/e-auction-notices" },
+    { id: "wcl", name: "Western Coalfields Ltd (WCL)", operator: "Coal India subsidiary — HQ Nagpur, Maharashtra", tags: ["coal","psu","central"], official: "https://westerncoal.in", tender: "https://westerncoal.in/en/notices" },
+    { id: "moc", name: "Ministry of Coal, Govt. of India", operator: "Central Government Ministry", tags: ["coal","ministry","central"], official: "https://coal.gov.in", tender: "https://www.mstcecommerce.com/auctionhome/coalblock/index.jsp" },
+    { id: "ntpc", name: "NTPC Limited", operator: "Central PSU — Power generation (Maharatna)", tags: ["power","psu","central"], official: "https://www.ntpc.co.in", tender: "https://eprocurentpc.nic.in/nicgep/app" },
+    { id: "cspgcl", name: "Chhattisgarh State Power Generation Co. (CSPGCL)", operator: "Chhattisgarh state genco (CSEB group)", tags: ["power","state","chhattisgarh"], official: "https://web.cspdcl.co.in/#/dashboard", tender: "https://web.cspdcl.co.in/#/ViewPublishedTender" },
+    { id: "jindalpower", name: "Jindal Power Limited (O.P. Jindal Group)", operator: "Private — power generation, Chhattisgarh", tags: ["power","private","chhattisgarh"], official: "https://www.jindalpower.com", tender: "https://www.jindalpower.com/tender" },
+    { id: "jspl", name: "Jindal Steel & Power Ltd (JSPL)", operator: "Private — steel, power & mining", tags: ["steel","coal","private","chhattisgarh"], official: "https://www.jspl.com", tender: "https://www.jindalpower.com/tender?filter=tenders" },
+    { id: "jswenergy", name: "JSW Energy (incl. KSK Mahanadi Power Plant)", operator: "Private — JSW Group. The Chhattisgarh Mahanadi plant is legally 'KSK Mahanadi Power Company Ltd', acquired by JSW Energy in 2025.", tags: ["power","private","chhattisgarh"], official: "https://www.jsw.in/energy", tender: "https://vendorportal.jsw.in/VENDOR/viewHome.action" },
+    { id: "balco", name: "BALCO (Bharat Aluminium Co., Vedanta Group)", operator: "Private (Govt. minority stake) — aluminium, Chhattisgarh", tags: ["aluminium","private","chhattisgarh"], official: "https://balcoindia.com", tender: "https://www.balcoindia.com/tenders/" },
+    { id: "dvc", name: "Damodar Valley Corporation (DVC)", operator: "Central statutory corporation — Ministry of Power", tags: ["power","central"], official: "https://www.dvc.gov.in/", tender: "https://www.dvc.gov.in/cms-web/tender-home" },
+  
+    // --- State power generation companies (added on request; tender links left blank for you to fill in) ---
+    { id: "gsecl", name: "Gujarat State Electricity Corporation (GSECL)", operator: "Gujarat state genco (GUVNL group)", tags: ["power","state","gujarat"], official: "https://www.gsecl.in", tender: "https://tender.guvnl.com/index.html?compcode=90" },
+    { id: "mahagenco", name: "Maharashtra State Power Generation Co. (MAHAGENCO)", operator: "Maharashtra state genco", tags: ["power","state","maharashtra"], official: "https://www.mahagenco.in", tender: "https://www.mahagenco.in/list_of_e_auction" },
+    { id: "tnpgcl", name: "Tamil Nadu Power Generation Corporation (TNPGCL)", operator: "Tamil Nadu state genco — successor to TANGEDCO's generation arm after the 2024 restructuring", tags: ["power","state","tamil-nadu"], official: "https://www.tnpgcl.org", tender: "" },
+    { id: "kpcl", name: "Karnataka Power Corporation Limited (KPCL)", operator: "Karnataka state genco", tags: ["power","state","karnataka"], official: "https://kpcl.karnataka.gov.in", tender: "https://kppp.karnataka.gov.in/#/portal/portal-home" },
+    { id: "apgenco", name: "Andhra Pradesh Power Generation Corp. (APGENCO)", operator: "Andhra Pradesh state genco", tags: ["power","state","andhra-pradesh"], official: "https://apgenco.gov.in", tender: "https://apgenco.gov.in/Main/page/3/2" },
+    { id: "tsgenco", name: "Telangana State Power Generation Corp. (TSGENCO)", operator: "Telangana state genco", tags: ["power","state","telangana"], official: "https://tggenco.com/TGGENCO/home.do", tender: "https://tggenco.com/TGGENCO/getInfo.do?mode=unspecified&oId=27&dt=2" },
+    { id: "mppgcl", name: "Madhya Pradesh Power Generating Co. (MPPGCL)", operator: "Madhya Pradesh state genco", tags: ["power","state","madhya-pradesh"], official: "https://www.mppgcl.mp.gov.in", tender: "https://mptenders.gov.in/nicgep/app" },
+    { id: "apgcl", name: "Assam Power Generation Corporation (APGCL)", operator: "Assam state genco", tags: ["power","state","assam"], official: "https://www.apgcl.org", tender: "https://www.apgcl.org/en/tenders/current-financial-year" },
+    { id: "bspgcl", name: "Bihar State Power Generation Co. (BSPGCL)", operator: "Bihar state genco (BSPHCL group)", tags: ["power","state","bihar"], official: "https://bspgcl.co.in/", tender: "https://eproc2.bihar.gov.in/EPSV2Web/" },
+    { id: "hpgcl", name: "Haryana Power Generation Corp. (HPGCL)", operator: "Haryana state genco", tags: ["power","state","haryana"], official: "https://hpgcl.org.in", tender: "https://etenders.hry.nic.in/nicgep/app" },
+    { id: "hppcl", name: "Himachal Pradesh Power Corp. (HPPCL)", operator: "Himachal Pradesh state genco", tags: ["power","state","himachal-pradesh"], official: "https://www.hppcl.in", tender: "https://www.hppcl.in/content/650_1_tender.aspx" },
+    { id: "juunl", name: "Jharkhand Urja Utpadan Nigam (JUUNL)", operator: "Jharkhand state genco (JUVNL group)", tags: ["power","state","jharkhand"], official: "https://juunl.co.in", tender: "https://jharkhandtenders.gov.in/nicgep/app" },
+    { id: "kseb", name: "Kerala State Electricity Board (KSEB)", operator: "Kerala state utility — generation, transmission & distribution", tags: ["power","state","kerala"], official: "https://kseb.in", tender: "https://kseb.in/tenders" },
+    { id: "mepgcl", name: "Meghalaya Power Generation Corp. (MePGCL)", operator: "Meghalaya state genco — runs under the Meghalaya Energy Corporation (MeECL) group site", tags: ["power","state","meghalaya"], official: "https://meecl.nic.in", tender: "https://meecl.nic.in/index.php/tenders/mepdcl/" },
+    { id: "opgc", name: "Odisha Power Generation Corporation (OPGC)", operator: "Odisha state genco", tags: ["power","state","odisha"], official: "https://www.opgc.co.in", tender: "https://www.opgc.co.in/ten/a1.asp" },
+    { id: "pspcl", name: "Punjab State Power Corporation (PSPCL)", operator: "Punjab state genco/utility", tags: ["power","state","punjab"], official: "https://pspcl.in", tender: "https://pspcl.in/e-auction-notice.aspx" },
+    { id: "rvunl", name: "Rajasthan Rajya Vidyut Utpadan Nigam (RVUNL)", operator: "Rajasthan state genco", tags: ["power","state","rajasthan"], official: "https://rvunl.com", tender: "https://energy.rajasthan.gov.in/rrvun/#/pages/sm/tender/offices/48935/183/0" },
+    { id: "tsecl", name: "Tripura State Electricity Corporation (TSECL)", operator: "Tripura state utility — generation, transmission & distribution", tags: ["power","state","tripura"], official: "https://tsecl.in", tender: "https://tsecl.in/tenders" },
+    { id: "uprvunl", name: "Uttar Pradesh Rajya Vidyut Utpadan Nigam (UPRVUNL)", operator: "Uttar Pradesh state genco", tags: ["power","state","uttar-pradesh"], official: "https://uprvunl.org", tender: "https://uprvunl.org/e-tender" },
+    { id: "upcl", name: "Uttarakhand Power Corporation (UPCL)", operator: "Uttarakhand state utility — note: primarily transmission & distribution, not generation", tags: ["power","state","uttarakhand"], official: "https://upcl.uk.gov.in", tender: "https://upcl.uk.gov.in/tenders-eoi/" },
+    { id: "wbpdcl", name: "West Bengal Power Development Corp. (WBPDCL)", operator: "West Bengal state genco", tags: ["power","state","west-bengal"], official: "https://www.wbpdcl.co.in", tender: "https://wbpdcl.co.in/tender-app/Tender-List#myanchor" },
+    { id: "jkpdcl", name: "Jammu & Kashmir Power Development Corp. (JKPDCL)", operator: "J&K/Ladakh state genco — formerly known as JKSPDC", tags: ["power","state","jammu-kashmir"], official: "https://jkspdc.co.in/#/", tender: "https://jkspdc.co.in/#/tenders" },
+    { id: "adanipower", name: "Adani Power Limited", operator: "Private — India's largest private thermal power producer, incl. a Chhattisgarh plant", tags: ["power","private","chhattisgarh"], official: "https://www.adanipower.com", tender: "https://www.adanipower.com/tender/tenderlisting" },
+  ];
+
+   const AGGREGATORS = [
+    { name: "GeM — Government e-Marketplace", desc: "National public procurement portal for goods & services across central/state govt bodies and PSUs.", url: "https://forwardauction.gem.gov.in/eprocure/home" },
+    { name: "CPPP / eProcure.gov.in", desc: "Central Public Procurement Portal — NIT/tender notices from central PSUs and government departments.", url: "https://eauction.gov.in/eAuction/app;jsessionid=F669C064D64404E6F73DA9FA35298A12.eauc1?page=FrontEndEauctionAdvancedSearch&service=page" },
+    { name: "Chhattisgarh eProcurement Portal", desc: "State-wide portal (run by CHiPS) — covers CSPGCL, PWD, mining and most CG govt bodies.", url: "https://cspc.co.in/cspgcl_tendernotices/CSPGCL_Tender.aspx?paramflag=1" },
+  ];
+  const kindOf = (tags) => {
+    if (tags.includes("private")) return "private";
+    if (tags.includes("coal")) return "coal";
+    if (tags.includes("power")) return "power";
+    return "psu";
+  };
+
+  document.getElementById("urlDisplay").textContent = STREAMLIT_URL;
+  document.getElementById("allTendersBtn").href = STREAMLIT_URL;
+
+  const allTags = [...new Set(COMPANIES.flatMap(c => c.tags))].sort();
+  const tagRow = document.getElementById("tagRow");
+  let activeTags = new Set();
+
+  allTags.forEach(tag => {
+    const chip = document.createElement("button");
+    chip.className = "tag-chip";
+    chip.textContent = tag;
+    chip.setAttribute("aria-pressed", "false");
+    chip.addEventListener("click", () => {
+      if (activeTags.has(tag)) { activeTags.delete(tag); chip.classList.remove("active"); chip.setAttribute("aria-pressed","false"); }
+      else { activeTags.add(tag); chip.classList.add("active"); chip.setAttribute("aria-pressed","true"); }
+      render();
+    });
+    tagRow.appendChild(chip);
+  });
+
+  const listEl = document.getElementById("companyList");
+  const emptyEl = document.getElementById("emptyState");
+  const countEl = document.getElementById("resultCount");
+  const searchInput = document.getElementById("searchInput");
+
+  function render() {
+    const q = searchInput.value.trim().toLowerCase();
+    const filtered = COMPANIES.filter(c => {
+      const matchesSearch = !q || c.name.toLowerCase().includes(q) || c.operator.toLowerCase().includes(q) || c.tags.some(t => t.includes(q));
+      const matchesTags = activeTags.size === 0 || c.tags.some(t => activeTags.has(t));
+      return matchesSearch && matchesTags;
+    });
+
+    countEl.textContent = `${filtered.length} of ${COMPANIES.length} organizations shown`;
+    listEl.innerHTML = "";
+
+    if (filtered.length === 0) {
+      emptyEl.style.display = "block";
+    } else {
+      emptyEl.style.display = "none";
+      filtered.forEach(c => {
+        const row = document.createElement("div");
+        row.className = "company-row";
+        row.dataset.kind = kindOf(c.tags);
+        // Companies with an explicit (even if blank) "tender" field are the
+        // newer additions where the user fills in the link themselves.
+        // Companies without that field fall back to the Streamlit directory.
+        let tenderBtn;
+        if (Object.prototype.hasOwnProperty.call(c, "tender")) {
+          if (c.tender) {
+            tenderBtn = `<a class="btn primary" href="${c.tender}" target="_blank" rel="noopener">Tenders 📑</a>`;
+          } else {
+            tenderBtn = `<span class="btn placeholder" title="Add this company's tender-page URL to the 'tender' field in companies.html">+ Add tender link</span>`;
+          }
+        } else {
+          tenderBtn = `<a class="btn primary" href="${STREAMLIT_URL}/?company=${c.id}" target="_blank" rel="noopener">Tenders 📑</a>`;
+        }
+
+        row.innerHTML = `
+          <div class="company-main">
+            <div class="company-name">${c.name}</div>
+            <div class="company-operator">${c.operator}</div>
+            <div class="chip-set">${c.tags.map(t => `<span class="mini-tag">${t}</span>`).join("")}</div>
+          </div>
+          <div class="row-actions">
+            <a class="btn" href="${c.official}" target="_blank" rel="noopener">Official site 🌐</a>
+            ${tenderBtn}
+          </div>
+        `;
+        listEl.appendChild(row);
+      });
+    }
+  }
+
+  searchInput.addEventListener("input", render);
+  render();
+
+  const aggList = document.getElementById("aggList");
+  AGGREGATORS.forEach(a => {
+    const row = document.createElement("div");
+    row.className = "agg-row";
+    row.innerHTML = `
+      <div>
+        <div class="agg-name">${a.name}</div>
+        <div class="agg-desc">${a.desc}</div>
+      </div>
+      <a class="btn primary" href="${a.url}" target="_blank" rel="noopener">Open ↗</a>
+    `;
+    aggList.appendChild(row);
+  });
+</script>
+</body>
+</html>
